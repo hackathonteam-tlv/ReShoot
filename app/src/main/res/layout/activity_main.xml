@@ -25,7 +25,9 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:adjustViewBounds="true"
-        android:background="@android:color/black" />
+        android:background="@android:color/black">
+
+    </com.google.android.cameraview.CameraView>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -41,7 +43,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        app:srcCompat="@drawable/ic_camera"
-         />
+        app:srcCompat="@drawable/ic_camera" />
+
+    <ImageView
+        android:id="@+id/open_gallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:paddingLeft="30dp"
+        android:paddingBottom="25dp"
+        app:srcCompat="@drawable/ic_open_gallery" />
 
 </RelativeLayout>
