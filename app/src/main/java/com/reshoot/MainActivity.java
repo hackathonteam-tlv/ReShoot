@@ -79,6 +79,21 @@ public class MainActivity extends AppCompatActivity implements
 
     private Handler mBackgroundHandler;
 
+    private View.OnClickListener galleryFabListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
+//            switch (v.getId()) {
+//                case R.id.take_picture:
+//                    if (mCameraView != null) {
+//                        //mCameraView.takePicture();
+//                        //EasyImage.openChooserWithGallery(Activity activity, String chooserTitle, 0);
+//                        EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
+//                    }
+//                    break;
+//            }
+        }
+    };
     private CameraView.Callback mCallback
             = new CameraView.Callback() {
 
@@ -136,6 +151,10 @@ public class MainActivity extends AppCompatActivity implements
 
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
+        }
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
+        if (fab != null) {
+            fab.setOnClickListener(galleryFabListener);
         }
     }
 
