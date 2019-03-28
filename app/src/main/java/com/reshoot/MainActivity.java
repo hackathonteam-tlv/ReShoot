@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 
+import pl.aprilapps.easyphotopicker.EasyImage;
+
 
 /**
  * This demo app saves the taken picture to a constant file.
@@ -74,16 +76,19 @@ public class MainActivity extends AppCompatActivity implements
 
     private Handler mBackgroundHandler;
 
-    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener galleryFabListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.take_picture:
-                    if (mCameraView != null) {
-                        mCameraView.takePicture();
-                    }
-                    break;
-            }
+            EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
+//            switch (v.getId()) {
+//                case R.id.take_picture:
+//                    if (mCameraView != null) {
+//                        //mCameraView.takePicture();
+//                        //EasyImage.openChooserWithGallery(Activity activity, String chooserTitle, 0);
+//                        EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
+//                    }
+//                    break;
+//            }
         }
     };
     private CameraView.Callback mCallback
@@ -141,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
         if (fab != null) {
-            fab.setOnClickListener(mOnClickListener);
+            fab.setOnClickListener(galleryFabListener);
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
