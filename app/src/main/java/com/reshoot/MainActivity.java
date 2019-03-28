@@ -37,6 +37,7 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import pl.aprilapps.easyphotopicker.EasyImage;
 
 
 /**
@@ -76,24 +77,10 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.camera) CameraView mCameraView;
     @BindView(R.id.take_photo) ImageButton mTakePhoto;
     @BindView(R.id.change_camera_direction) ImageButton mChangeCamera;
+    @BindView(R.id.open_gallery) ImageButton mOpenGallery;
 
     private Handler mBackgroundHandler;
 
-    private View.OnClickListener galleryFabListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
-//            switch (v.getId()) {
-//                case R.id.take_picture:
-//                    if (mCameraView != null) {
-//                        //mCameraView.takePicture();
-//                        //EasyImage.openChooserWithGallery(Activity activity, String chooserTitle, 0);
-//                        EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
-//                    }
-//                    break;
-//            }
-        }
-    };
     private CameraView.Callback mCallback
             = new CameraView.Callback() {
 
@@ -151,10 +138,6 @@ public class MainActivity extends AppCompatActivity implements
 
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
-        }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
-        if (fab != null) {
-            fab.setOnClickListener(galleryFabListener);
         }
     }
 
@@ -269,6 +252,11 @@ public class MainActivity extends AppCompatActivity implements
             mCameraView.setFacing(facing == CameraView.FACING_FRONT ?
                     CameraView.FACING_BACK : CameraView.FACING_FRONT);
         }
+    }
+
+    @OnClick(R.id.open_gallery)
+    void onOpenGalleryClicked() {
+        EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
     }
 
     public static class ConfirmationDialogFragment extends DialogFragment {
