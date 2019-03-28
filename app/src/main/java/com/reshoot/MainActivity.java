@@ -11,21 +11,18 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.cameraview.AspectRatio;
@@ -39,6 +36,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -75,23 +73,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private int mCurrentFlash;
 
-    @BindView(R.id.camera)
-    public CameraView mCameraView;
+    @BindView(R.id.camera) CameraView mCameraView;
+    @BindView(R.id.take_photo) ImageButton mTakePhoto;
+    @BindView(R.id.change_camera_direction) ImageButton mChangeCamera;
 
     private Handler mBackgroundHandler;
 
-    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.take_picture:
-                    if (mCameraView != null) {
-                        mCameraView.takePicture();
-                    }
-                    break;
-            }
-        }
-    };
     private CameraView.Callback mCallback
             = new CameraView.Callback() {
 
@@ -110,25 +97,22 @@ public class MainActivity extends AppCompatActivity implements
             Log.d(TAG, "onPictureTaken " + data.length);
             Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
                     .show();
-            getBackgroundHandler().post(new Runnable() {
-                @Override
-                public void run() {
-                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "picture.jpg");
-                    OutputStream os = null;
-                    try {
-                        os = new FileOutputStream(file);
-                        os.write(data);
-                        os.close();
-                    } catch (IOException e) {
-                        Log.w(TAG, "Cannot write to " + file, e);
-                    } finally {
-                        if (os != null) {
-                            try {
-                                os.close();
-                            } catch (IOException e) {
-                                // Ignore
-                            }
+            getBackgroundHandler().post(() -> {
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                        "picture.jpg");
+                OutputStream os = null;
+                try {
+                    os = new FileOutputStream(file);
+                    os.write(data);
+                    os.close();
+                } catch (IOException e) {
+                    Log.w(TAG, "Cannot write to " + file, e);
+                } finally {
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException e) {
+                            // Ignore
                         }
                     }
                 }
@@ -148,18 +132,10 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mTakePhoto.setOnClickListener(v -> mCameraView.takePicture());
+
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
-        }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
-        if (fab != null) {
-            fab.setOnClickListener(mOnClickListener);
-        }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
         }
     }
 
@@ -246,13 +222,6 @@ public class MainActivity extends AppCompatActivity implements
                     mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
                 }
                 return true;
-            case R.id.switch_camera:
-                if (mCameraView != null) {
-                    int facing = mCameraView.getFacing();
-                    mCameraView.setFacing(facing == CameraView.FACING_FRONT ?
-                            CameraView.FACING_BACK : CameraView.FACING_FRONT);
-                }
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -272,6 +241,15 @@ public class MainActivity extends AppCompatActivity implements
             mBackgroundHandler = new Handler(thread.getLooper());
         }
         return mBackgroundHandler;
+    }
+
+    @OnClick(R.id.change_camera_direction)
+    void onChangeCameraDirection() {
+        if (mCameraView != null) {
+            int facing = mCameraView.getFacing();
+            mCameraView.setFacing(facing == CameraView.FACING_FRONT ?
+                    CameraView.FACING_BACK : CameraView.FACING_FRONT);
+        }
     }
 
     public static class ConfirmationDialogFragment extends DialogFragment {

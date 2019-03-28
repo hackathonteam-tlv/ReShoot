@@ -35,24 +35,95 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:visibility="gone" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/take_picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        app:srcCompat="@drawable/ic_camera" />
-
-    <ImageView
+    <ImageButton
         android:id="@+id/open_gallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:paddingLeft="30dp"
-        android:paddingBottom="25dp"
+        android:background="@android:color/transparent"
+        android:paddingLeft="@dimen/horizontal_padding"
+        android:paddingBottom="@dimen/vertical_padding"
         app:srcCompat="@drawable/ic_open_gallery" />
+
+    <ImageButton
+        android:id="@+id/take_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
+        android:paddingBottom="@dimen/vertical_padding"
+        app:srcCompat="@drawable/take_photo_icon" />
+
+    <ImageButton
+        android:id="@+id/masks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:paddingRight="@dimen/horizontal_padding"
+        android:paddingBottom="@dimen/vertical_padding"
+        app:srcCompat="@drawable/masks_icon" />
+
+    <ImageButton
+        android:id="@+id/change_camera_direction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@android:color/transparent"
+        android:paddingTop="@dimen/vertical_padding"
+        android:paddingRight="@dimen/horizontal_padding"
+        app:srcCompat="@drawable/back_camera_icon" />
+
+    <ImageButton
+        android:id="@+id/flash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/change_camera_direction"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
+        android:paddingLeft="@dimen/horizontal_padding"
+        android:paddingTop="@dimen/vertical_padding"
+        app:srcCompat="@drawable/flash_off_icon" />
+
+    <ImageView
+        android:id="@+id/transparent_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/take_photo"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/vertical_padding"
+        android:weightSum="5">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <SeekBar
+            android:id="@+id/transparency_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
 
 </RelativeLayout>
