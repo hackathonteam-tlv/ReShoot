@@ -44,6 +44,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         app:srcCompat="@drawable/ic_camera"
-        app:useCompatPadding="true" />
+         />
 
 </RelativeLayout>
