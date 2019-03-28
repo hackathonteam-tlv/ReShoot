@@ -35,6 +35,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 /**
  * This demo app saves the taken picture to a constant file.
@@ -70,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private int mCurrentFlash;
 
-    private CameraView mCameraView;
+    @BindView(R.id.camera)
+    public CameraView mCameraView;
 
     private Handler mBackgroundHandler;
 
@@ -135,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mCameraView = (CameraView) findViewById(R.id.camera);
+        ButterKnife.bind(this);
+
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
         }
