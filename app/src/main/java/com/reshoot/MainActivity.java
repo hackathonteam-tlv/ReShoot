@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.camera) CameraView mCameraView;
     @BindView(R.id.take_photo) ImageButton mTakePhoto;
     @BindView(R.id.change_camera_direction) ImageButton mChangeCamera;
+    //@BindView(R.id.switch_flash) ImageButton mChangeFlash;
+
 
     private Handler mBackgroundHandler;
 
@@ -214,14 +216,14 @@ public class MainActivity extends AppCompatActivity implements
                             .show(fragmentManager, FRAGMENT_DIALOG);
                 }
                 return true;
-            case R.id.switch_flash:
-                if (mCameraView != null) {
-                    mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
-                    item.setTitle(FLASH_TITLES[mCurrentFlash]);
-                    item.setIcon(FLASH_ICONS[mCurrentFlash]);
-                    mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
-                }
-                return true;
+//            case R.id.switch_flash:
+//                if (mCameraView != null) {
+//                    mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
+//                    item.setTitle(FLASH_TITLES[mCurrentFlash]);
+//                    item.setIcon(FLASH_ICONS[mCurrentFlash]);
+//                    mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
+//                }
+//                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -251,6 +253,16 @@ public class MainActivity extends AppCompatActivity implements
                     CameraView.FACING_BACK : CameraView.FACING_FRONT);
         }
     }
+
+//    @OnClick(R.id.switch_flash)
+//    void onSwitchFlash() {
+//        if (mCameraView == null) { return; }
+//        mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
+//        //mChangeFlash.setTitle(FLASH_TITLES[mCurrentFlash]);
+//        //mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
+//        Log.d(TAG,"onSwitchFlash was pressed (YG)"); //yg
+//        //mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
+//    }
 
     public static class ConfirmationDialogFragment extends DialogFragment {
 
