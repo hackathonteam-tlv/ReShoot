@@ -66,9 +66,16 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.ic_flash_on,
     };
 
+    private static final int[] MASKS_ICONS = {
+            R.drawable.ic_flash_auto,
+            R.drawable.ic_flash_off,
+            R.drawable.ic_flash_on,
+    };
+
     public static final int DEFAULT_TRANSPARENCY = 50;
 
     private int mCurrentFlash;
+    private int mCurrentMask;
     private Image mCurrentImage;
 
     @BindView(R.id.camera) CameraView mCameraView;
@@ -78,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.transparent_image) ImageView mTransparentImageView;
     @BindView(R.id.transparency_bar) BubbleSeekBar mTransparencyBar;
     @BindView(R.id.flash) ImageButton mChangeFlash;
+//    @BindView(R.id.masks) ImageButton mOpenCompareWin;
+    @BindView(R.id.masks) ImageButton mChangeMask;
 
 
     private Handler mBackgroundHandler;
@@ -260,6 +269,18 @@ public class MainActivity extends AppCompatActivity implements
         //mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
         mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
         mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
+    }
+
+    @OnClick(R.id.masks)
+    void onChangeMask() {
+        if (mCameraView == null) return;
+        mCurrentMask = (mCurrentMask + 1) % 3; // todo: change to define
+        Log.d(TAG,"mask was pressed #" + mCurrentMask);
+        Intent intent = new Intent(this, CompareActivity.class);
+        startActivity(intent);
+
+//        mChangeMask.setImageDrawable(getDrawable(MASKS_ICONS[mCurrentMask]));
+//        mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
     }
 
     public static class ConfirmationDialogFragment extends DialogFragment {
