@@ -5,11 +5,14 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
@@ -34,7 +37,9 @@ import com.xw.repo.BubbleSeekBar;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -98,31 +103,53 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
             Log.d(TAG, "onPictureTaken " + data.length);
-            Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
-                    .show();
             getBackgroundHandler().post(() -> {
-                File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                        "picture.jpg");
-                OutputStream os = null;
+                File pictureFileDir = getDir("images", 0);
+
+                if (!pictureFileDir.exists() && !pictureFileDir.mkdirs()) {
+                    Toast.makeText(getApplicationContext(), "Can't create directory to save image.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
+                String date = dateFormat.format(new Date());
+                String photoFile = "ReShoot_" + date + ".jpg";
+
+                String filename = pictureFileDir.getPath() + File.separator + photoFile;
+
+                File pictureFile = new File(filename);
+
                 try {
-                    os = new FileOutputStream(file);
-                    os.write(data);
-                    os.close();
-                } catch (IOException e) {
-                    Log.w(TAG, "Cannot write to " + file, e);
-                } finally {
-                    if (os != null) {
-                        try {
-                            os.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
+                    FileOutputStream fos = new FileOutputStream(pictureFile);
+                    fos.write(data);
+                    fos.close();
+
+                    //Insert image into gallery
+                    Bitmap bitmap = BitmapFactory.decodeFile(pictureFile.getPath());
+                    MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, photoFile , "");
+
+                } catch (Exception error) {
+                    Toast.makeText(getApplicationContext(), "Image could not be saved.",
+                            Toast.LENGTH_LONG).show();
                 }
             });
         }
 
     };
+
+    private File createImageFile() throws IOException {
+        String timeStamp =
+                new SimpleDateFormat("yyyyMMdd_HHmmss",
+                        Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG_" + timeStamp + "_";
+        File storageDir =
+                getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        File image = new File(storageDir, imageFileName + ",jpg");
+
+        String imageFilePath = image.getAbsolutePath();
+        return image;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
