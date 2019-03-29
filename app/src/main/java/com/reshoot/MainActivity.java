@@ -2,14 +2,15 @@ package com.reshoot;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.arch.lifecycle.Lifecycle;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.MediaStore;
@@ -36,10 +37,8 @@ import com.xw.repo.BubbleSeekBar;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -92,6 +91,11 @@ public class MainActivity extends AppCompatActivity implements
     BubbleSeekBar mTransparencyBar;
     @BindView(R.id.flash)
     ImageButton mChangeFlash;
+    @BindView(R.id.result_image)
+    ImageView resultImageView;
+    @BindView(R.id.masks)
+    ImageButton mMasksButton;
+    @BindView(R.id.back_arrow) ImageButton mBackArrow;
 
 
     private Handler mBackgroundHandler;
@@ -154,22 +158,35 @@ public class MainActivity extends AppCompatActivity implements
     };
 
     private void startPreviewActivityOnPictureCaptured(File pictureFile) {
-        Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
-        i.putExtra(TAKEN_IMAGE_PATH_KEY, pictureFile.getAbsolutePath());
-        startActivity(i);
+        if (!this.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.CREATED))
+            return;
+
+        resultImageView.setImageURI(Uri.fromFile(pictureFile));
+        resultImageView.setVisibility(View.VISIBLE);
+        mTransparentImageView.setVisibility(View.INVISIBLE);
+
+        mOpenGallery.setVisibility(View.GONE);
+        mChangeFlash.setVisibility(View.GONE);
+        mTransparencyBar.setVisibility(View.GONE);
+        mTakePhoto.setVisibility(View.GONE);
+        mMasksButton.setVisibility(View.GONE);
+        mChangeCamera.setVisibility(View.GONE);
+
+        mBackArrow.setVisibility(View.VISIBLE);
     }
 
-    private File createImageFile() throws IOException {
-        String timeStamp =
-                new SimpleDateFormat("yyyyMMdd_HHmmss",
-                        Locale.getDefault()).format(new Date());
-        String imageFileName = "IMG_" + timeStamp + "_";
-        File storageDir =
-                getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        File image = new File(storageDir, imageFileName + ",jpg");
+    @OnClick(R.id.back_arrow) void onBackArrowPressed() {
+        resultImageView.setVisibility(View.GONE);
+        mTransparentImageView.setVisibility(View.VISIBLE);
 
-        String imageFilePath = image.getAbsolutePath();
-        return image;
+        mOpenGallery.setVisibility(View.VISIBLE);
+        mChangeFlash.setVisibility(View.VISIBLE);
+        mTransparencyBar.setVisibility(View.VISIBLE);
+        mTakePhoto.setVisibility(View.VISIBLE);
+        mMasksButton.setVisibility(View.VISIBLE);
+        mChangeCamera.setVisibility(View.VISIBLE);
+
+        mBackArrow.setVisibility(View.GONE);
     }
 
     @Override
@@ -302,8 +319,6 @@ public class MainActivity extends AppCompatActivity implements
     void onSwitchFlash() {
         if (mCameraView == null) return;
         mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
-//        mChangeFlash.setTitle(FLASH_TITLES[mCurrentFlash]);
-        //mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
         mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
         mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
     }

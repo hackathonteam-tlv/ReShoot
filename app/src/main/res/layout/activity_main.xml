@@ -35,7 +35,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-
         android:alpha="0.5" />
 
     <android.support.v7.widget.Toolbar
@@ -59,13 +58,25 @@
         app:srcCompat="@drawable/ic_open_gallery" />
 
     <ImageButton
+        android:id="@+id/back_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:paddingLeft="@dimen/horizontal_padding"
+        android:paddingBottom="@dimen/vertical_padding"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ef_ic_arrow_back" />
+
+    <ImageButton
         android:id="@+id/take_photo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:background="@android:color/transparent"
-        android:paddingBottom="@dimen/vertical_padding"
+        android:paddingBottom="15dp"
         app:srcCompat="@drawable/take_photo_icon" />
 
     <ImageButton
@@ -121,8 +132,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            app:bsb_hide_bubble="true"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:bsb_hide_bubble="true" />
 
         <Space
             android:layout_width="0dp"
@@ -130,6 +141,13 @@
             android:layout_weight="1" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/result_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:visibility="gone" />
 
 
 </RelativeLayout>
