@@ -5,11 +5,14 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
@@ -34,7 +37,9 @@ import com.xw.repo.BubbleSeekBar;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final String TAG = "MainActivity";
+
+    public static final String TAKEN_IMAGE_PATH_KEY = "taken_image_path";
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
@@ -71,13 +78,20 @@ public class MainActivity extends AppCompatActivity implements
     private int mCurrentFlash;
     private Image mCurrentImage;
 
-    @BindView(R.id.camera) CameraView mCameraView;
-    @BindView(R.id.take_photo) ImageButton mTakePhoto;
-    @BindView(R.id.change_camera_direction) ImageButton mChangeCamera;
-    @BindView(R.id.open_gallery) ImageButton mOpenGallery;
-    @BindView(R.id.transparent_image) ImageView mTransparentImageView;
-    @BindView(R.id.transparency_bar) BubbleSeekBar mTransparencyBar;
-    @BindView(R.id.flash) ImageButton mChangeFlash;
+    @BindView(R.id.camera)
+    CameraView mCameraView;
+    @BindView(R.id.take_photo)
+    ImageButton mTakePhoto;
+    @BindView(R.id.change_camera_direction)
+    ImageButton mChangeCamera;
+    @BindView(R.id.open_gallery)
+    ImageButton mOpenGallery;
+    @BindView(R.id.transparent_image)
+    ImageView mTransparentImageView;
+    @BindView(R.id.transparency_bar)
+    BubbleSeekBar mTransparencyBar;
+    @BindView(R.id.flash)
+    ImageButton mChangeFlash;
 
 
     private Handler mBackgroundHandler;
@@ -98,31 +112,65 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
             Log.d(TAG, "onPictureTaken " + data.length);
-            Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
-                    .show();
-            getBackgroundHandler().post(() -> {
-                File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                        "picture.jpg");
-                OutputStream os = null;
+            mBackgroundHandler = createBackgroundHandler();
+            mBackgroundHandler.post(() -> {
+                File pictureFileDir = getDir("images", 0);
+
+                if (!pictureFileDir.exists() && !pictureFileDir.mkdirs()) {
+                    Toast.makeText(getApplicationContext(), "Can't create directory to save image.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
+                String date = dateFormat.format(new Date());
+                String photoFile = "ReShoot_" + date + ".jpg";
+
+                String filename = pictureFileDir.getPath() + File.separator + photoFile;
+
+                File pictureFile = new File(filename);
+
                 try {
-                    os = new FileOutputStream(file);
-                    os.write(data);
-                    os.close();
-                } catch (IOException e) {
-                    Log.w(TAG, "Cannot write to " + file, e);
-                } finally {
-                    if (os != null) {
-                        try {
-                            os.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
+                    FileOutputStream fos = new FileOutputStream(pictureFile);
+                    fos.write(data);
+                    fos.close();
+
+                    //Insert image into gallery
+                    Bitmap bitmap = BitmapFactory.decodeFile(pictureFile.getPath());
+                    MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, photoFile, "");
+
+                    runOnUiThread(() -> {
+                        startPreviewActivityOnPictureCaptured(pictureFile);
+                    });
+
+
+                } catch (Exception error) {
+                    Toast.makeText(getApplicationContext(), "Image could not be saved.",
+                            Toast.LENGTH_LONG).show();
                 }
             });
         }
 
     };
+
+    private void startPreviewActivityOnPictureCaptured(File pictureFile) {
+        Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
+        i.putExtra(TAKEN_IMAGE_PATH_KEY, pictureFile.getAbsolutePath());
+        startActivity(i);
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp =
+                new SimpleDateFormat("yyyyMMdd_HHmmss",
+                        Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG_" + timeStamp + "_";
+        File storageDir =
+                getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        File image = new File(storageDir, imageFileName + ",jpg");
+
+        String imageFilePath = image.getAbsolutePath();
+        return image;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -214,13 +263,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private Handler getBackgroundHandler() {
-        if (mBackgroundHandler == null) {
-            HandlerThread thread = new HandlerThread("background");
-            thread.start();
-            mBackgroundHandler = new Handler(thread.getLooper());
-        }
-        return mBackgroundHandler;
+    private Handler createBackgroundHandler() {
+        HandlerThread thread = new HandlerThread("background");
+        thread.start();
+        return new Handler(thread.getLooper());
     }
 
     @OnClick(R.id.change_camera_direction)

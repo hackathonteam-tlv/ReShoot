@@ -16,13 +16,13 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary"
+    android:background="@android:color/black"
     tools:context="com.reshoot.MainActivity">
 
     <com.google.android.cameraview.CameraView
         android:id="@+id/camera"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:adjustViewBounds="true"
         android:background="@android:color/black"
@@ -34,6 +34,8 @@
         android:id="@+id/transparent_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+
         android:alpha="0.5" />
 
     <android.support.v7.widget.Toolbar
