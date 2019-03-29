@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -32,6 +33,7 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
+import com.xw.repo.BubbleSeekBar;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements
             R.string.flash_off,
             R.string.flash_on,
     };
+    public static final int DEFAULT_TRANSPARENCY = 50;
 
     private int mCurrentFlash;
     private Image mCurrentImage;
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.change_camera_direction) ImageButton mChangeCamera;
     @BindView(R.id.open_gallery) ImageButton mOpenGallery;
     @BindView(R.id.transparent_image) ImageView mTransparentImageView;
+    @BindView(R.id.transparency_bar) BubbleSeekBar mTransparencyBar;
 
 
     private Handler mBackgroundHandler;
@@ -142,6 +146,22 @@ public class MainActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
 
         mTakePhoto.setOnClickListener(v -> mCameraView.takePicture());
+        mTransparencyBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+                mTransparentImageView.setAlpha(progressFloat / 100);
+            }
+
+            @Override
+            public void getProgressOnActionUp(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+
+            }
+
+            @Override
+            public void getProgressOnFinally(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+
+            }
+        });
 
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
@@ -276,6 +296,8 @@ public class MainActivity extends AppCompatActivity implements
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             mCurrentImage = ImagePicker.getFirstImageOrNull(data);
             Glide.with(mTransparentImageView).load(mCurrentImage.getPath()).into(mTransparentImageView);
+            mTransparencyBar.setVisibility(View.VISIBLE);
+            mTransparencyBar.setProgress(DEFAULT_TRANSPARENCY);
         }
     }
 
