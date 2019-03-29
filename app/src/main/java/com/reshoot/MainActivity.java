@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
 
+    public static final String TAKEN_IMAGE_PATH_KEY = "taken_image_path";
+
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     private static final String FRAGMENT_DIALOG = "dialog";
@@ -76,13 +78,20 @@ public class MainActivity extends AppCompatActivity implements
     private int mCurrentFlash;
     private Image mCurrentImage;
 
-    @BindView(R.id.camera) CameraView mCameraView;
-    @BindView(R.id.take_photo) ImageButton mTakePhoto;
-    @BindView(R.id.change_camera_direction) ImageButton mChangeCamera;
-    @BindView(R.id.open_gallery) ImageButton mOpenGallery;
-    @BindView(R.id.transparent_image) ImageView mTransparentImageView;
-    @BindView(R.id.transparency_bar) BubbleSeekBar mTransparencyBar;
-    @BindView(R.id.flash) ImageButton mChangeFlash;
+    @BindView(R.id.camera)
+    CameraView mCameraView;
+    @BindView(R.id.take_photo)
+    ImageButton mTakePhoto;
+    @BindView(R.id.change_camera_direction)
+    ImageButton mChangeCamera;
+    @BindView(R.id.open_gallery)
+    ImageButton mOpenGallery;
+    @BindView(R.id.transparent_image)
+    ImageView mTransparentImageView;
+    @BindView(R.id.transparency_bar)
+    BubbleSeekBar mTransparencyBar;
+    @BindView(R.id.flash)
+    ImageButton mChangeFlash;
 
 
     private Handler mBackgroundHandler;
@@ -103,7 +112,8 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
             Log.d(TAG, "onPictureTaken " + data.length);
-            getBackgroundHandler().post(() -> {
+            mBackgroundHandler = createBackgroundHandler();
+            mBackgroundHandler.post(() -> {
                 File pictureFileDir = getDir("images", 0);
 
                 if (!pictureFileDir.exists() && !pictureFileDir.mkdirs()) {
@@ -127,7 +137,12 @@ public class MainActivity extends AppCompatActivity implements
 
                     //Insert image into gallery
                     Bitmap bitmap = BitmapFactory.decodeFile(pictureFile.getPath());
-                    MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, photoFile , "");
+                    MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, photoFile, "");
+
+                    runOnUiThread(() -> {
+                        startPreviewActivityOnPictureCaptured(pictureFile);
+                    });
+
 
                 } catch (Exception error) {
                     Toast.makeText(getApplicationContext(), "Image could not be saved.",
@@ -137,6 +152,12 @@ public class MainActivity extends AppCompatActivity implements
         }
 
     };
+
+    private void startPreviewActivityOnPictureCaptured(File pictureFile) {
+        Intent i = new Intent(getApplicationContext(), PreviewActivity.class);
+        i.putExtra(TAKEN_IMAGE_PATH_KEY, pictureFile.getAbsolutePath());
+        startActivity(i);
+    }
 
     private File createImageFile() throws IOException {
         String timeStamp =
@@ -211,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -241,13 +263,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private Handler getBackgroundHandler() {
-        if (mBackgroundHandler == null) {
-            HandlerThread thread = new HandlerThread("background");
-            thread.start();
-            mBackgroundHandler = new Handler(thread.getLooper());
-        }
-        return mBackgroundHandler;
+    private Handler createBackgroundHandler() {
+        HandlerThread thread = new HandlerThread("background");
+        thread.start();
+        return new Handler(thread.getLooper());
     }
 
     @OnClick(R.id.change_camera_direction)
