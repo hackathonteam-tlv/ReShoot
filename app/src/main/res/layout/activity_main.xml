@@ -29,6 +29,12 @@
 
     </com.google.android.cameraview.CameraView>
 
+    <ImageView
+        android:id="@+id/transparent_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5" />
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -81,6 +87,7 @@
         android:paddingRight="@dimen/horizontal_padding"
         app:srcCompat="@drawable/back_camera_icon" />
 
+
     <ImageButton
         android:id="@+id/flash"
         android:layout_width="wrap_content"
@@ -92,12 +99,6 @@
         android:paddingLeft="@dimen/horizontal_padding"
         android:paddingTop="@dimen/vertical_padding"
         app:srcCompat="@drawable/flash_off_icon" />
-
-    <ImageView
-        android:id="@+id/transparent_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0.5" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -3,6 +3,7 @@ package com.reshoot;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,8 +24,12 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.model.Image;
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
 
@@ -37,7 +42,6 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import pl.aprilapps.easyphotopicker.EasyImage;
 
 
 /**
@@ -73,11 +77,14 @@ public class MainActivity extends AppCompatActivity implements
     };
 
     private int mCurrentFlash;
+    private Image mCurrentImage;
 
     @BindView(R.id.camera) CameraView mCameraView;
     @BindView(R.id.take_photo) ImageButton mTakePhoto;
     @BindView(R.id.change_camera_direction) ImageButton mChangeCamera;
     @BindView(R.id.open_gallery) ImageButton mOpenGallery;
+    @BindView(R.id.transparent_image) ImageView mTransparentImageView;
+
 
     private Handler mBackgroundHandler;
 
@@ -256,7 +263,20 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.open_gallery)
     void onOpenGalleryClicked() {
-        EasyImage.openChooserWithGallery(MainActivity.this, "Choose a Picture", 0);
+        ImagePicker.create(this)
+                .folderMode(true)
+                .toolbarFolderTitle("Choose a picture")
+                .single()
+                .start();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
+            mCurrentImage = ImagePicker.getFirstImageOrNull(data);
+            Glide.with(mTransparentImageView).load(mCurrentImage.getPath()).into(mTransparentImageView);
+        }
     }
 
     public static class ConfirmationDialogFragment extends DialogFragment {
