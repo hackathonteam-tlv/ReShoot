@@ -25,7 +25,8 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:adjustViewBounds="true"
-        android:background="@android:color/black">
+        android:background="@android:color/black"
+        app:flash="auto">
 
     </com.google.android.cameraview.CameraView>
 
@@ -98,7 +99,7 @@
         android:background="@android:color/transparent"
         android:paddingLeft="@dimen/horizontal_padding"
         android:paddingTop="@dimen/vertical_padding"
-        app:srcCompat="@drawable/flash_off_icon" />
+        app:srcCompat="@drawable/ic_flash_auto" />
 
     <LinearLayout
         android:layout_width="match_parent"

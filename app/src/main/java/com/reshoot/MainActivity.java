@@ -14,13 +14,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -31,7 +28,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
-import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
 import com.xw.repo.BubbleSeekBar;
 
@@ -39,7 +35,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,8 +46,7 @@ import butterknife.OnClick;
  * $ adb pull /sdcard/Android/data/com.google.android.cameraview.demo/files/Pictures/picture.jpg
  */
 public class MainActivity extends AppCompatActivity implements
-        ActivityCompat.OnRequestPermissionsResultCallback,
-        AspectRatioFragment.Listener {
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final String TAG = "MainActivity";
 
@@ -72,11 +66,6 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.ic_flash_on,
     };
 
-    private static final int[] FLASH_TITLES = {
-            R.string.flash_auto,
-            R.string.flash_off,
-            R.string.flash_on,
-    };
     public static final int DEFAULT_TRANSPARENCY = 50;
 
     private int mCurrentFlash;
@@ -88,8 +77,7 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.open_gallery) ImageButton mOpenGallery;
     @BindView(R.id.transparent_image) ImageView mTransparentImageView;
     @BindView(R.id.transparency_bar) BubbleSeekBar mTransparencyBar;
-
-    //@BindView(R.id.switch_flash) ImageButton mChangeFlash;
+    @BindView(R.id.flash) ImageButton mChangeFlash;
 
 
     private Handler mBackgroundHandler;
@@ -226,45 +214,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.aspect_ratio:
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                if (mCameraView != null
-                        && fragmentManager.findFragmentByTag(FRAGMENT_DIALOG) == null) {
-                    final Set<AspectRatio> ratios = mCameraView.getSupportedAspectRatios();
-                    final AspectRatio currentRatio = mCameraView.getAspectRatio();
-                    AspectRatioFragment.newInstance(ratios, currentRatio)
-                            .show(fragmentManager, FRAGMENT_DIALOG);
-                }
-                return true;
-//            case R.id.switch_flash:
-//                if (mCameraView != null) {
-//                    mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
-//                    item.setTitle(FLASH_TITLES[mCurrentFlash]);
-//                    item.setIcon(FLASH_ICONS[mCurrentFlash]);
-//                    mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
-//                }
-//                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onAspectRatioSelected(@NonNull AspectRatio ratio) {
-        if (mCameraView != null) {
-            Toast.makeText(this, ratio.toString(), Toast.LENGTH_SHORT).show();
-            mCameraView.setAspectRatio(ratio);
-        }
-    }
-
     private Handler getBackgroundHandler() {
         if (mBackgroundHandler == null) {
             HandlerThread thread = new HandlerThread("background");
@@ -303,15 +252,15 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-//    @OnClick(R.id.switch_flash)
-//    void onSwitchFlash() {
-//        if (mCameraView == null) { return; }
-//        mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
-//        //mChangeFlash.setTitle(FLASH_TITLES[mCurrentFlash]);
-//        //mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
-//        Log.d(TAG,"onSwitchFlash was pressed (YG)"); //yg
-//        //mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
-//    }
+    @OnClick(R.id.flash)
+    void onSwitchFlash() {
+        if (mCameraView == null) return;
+        mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
+//        mChangeFlash.setTitle(FLASH_TITLES[mCurrentFlash]);
+        //mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
+        mChangeFlash.setImageDrawable(getDrawable(FLASH_ICONS[mCurrentFlash]));
+        mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
+    }
 
     public static class ConfirmationDialogFragment extends DialogFragment {
 
